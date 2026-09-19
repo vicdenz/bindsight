@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { sanitizedFederatoSchema } from "../../fixtures/federato/schema";
 import { validPolicyPlan } from "../../fixtures/federato/plans";
-import type { FederatoTokenProvider } from "../../lib/federato/auth";
-import { FederatoClient, FederatoClientError, type FederatoTransport } from "../../lib/federato/client";
+import { Auth0FederatoTokenProvider, FEDERATO_AUDIENCE, type FederatoTokenProvider } from "../../lib/federato/auth";
+import { FederatoClient, FederatoClientError, HttpFederatoTransport, normalizeQueryPage, type FederatoTransport } from "../../lib/federato/client";
 import { lowerQueryPlan } from "../../lib/federato/query-lowerer";
 
 const request = lowerQueryPlan(validPolicyPlan, sanitizedFederatoSchema);
@@ -67,5 +67,35 @@ describe("FederatoClient", () => {
     await expect(new FederatoClient(tokenProvider(), transport).query(request)).rejects.toEqual(
       new FederatoClientError("field is unavailable", 400),
     );
+  });
+});
+
+describe("documented Federato HTTP boundary", () => {
+  it("mints and caches a token with the exact Auth0 client-credentials body", async () => {
+    const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ access_token: "token-value", expires_in: 14_400, token_type: "Bearer" }), { status: 200 }));
+    const provider = new Auth0FederatoTokenProvider({ clientId: "client", clientSecret: "secret", authUrl: "https://auth.product.federato.ai/oauth/token", handlerUrl: "unused" }, fetcher);
+    await expect(provider.getToken()).resolves.toMatchObject({ value: "token-value" });
+    await provider.getToken();
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    const [, init] = fetcher.mock.calls[0];
+    expect(JSON.parse(init.body)).toEqual({ client_id: "client", client_secret: "secret", audience: FEDERATO_AUDIENCE, grant_type: "client_credentials" });
+  });
+
+  it("posts exact schema and query action envelopes with bearer auth", async () => {
+    const rawSchema = { Policy: { type: "object", fields: { id: { type: "number" }, locations: { type: "reference", resource: "Location", cardinality: "many" } } }, Location: { type: "object", fields: { state: { type: "string" } } } };
+    const fetcher = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify(rawSchema), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ total: 1, data: [{ id: 1 }] }), { status: 200 }));
+    const transport = new HttpFederatoTransport("https://product.federato.ai/handler?outputOnly=true", fetcher);
+    await expect(transport.discoverSchema("token")).resolves.toMatchObject({ status: 200, data: { resources: { Policy: { name: "Policy" } } } });
+    await transport.query("token", request);
+    expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({ action: "schema" });
+    expect(JSON.parse(fetcher.mock.calls[1][1].body)).toEqual({ action: "query", payload: request });
+    expect(fetcher.mock.calls[1][1].headers).toMatchObject({ Authorization: "Bearer token", "Content-Type": "application/json" });
+  });
+
+  it("normalizes documented group totals and paginated records", () => {
+    expect(normalizeQueryPage({ total: 2, groups: [{ state: "CA" }] })).toEqual({ total: 2, records: [{ state: "CA" }], groups: [{ state: "CA" }] });
+    expect(normalizeQueryPage({ total: 42, data: [{ id: 1 }] })).toEqual({ total: 42, records: [{ id: 1 }] });
   });
 });

@@ -26,7 +26,7 @@ function expansionTarget(
   if (!rootResource) return { error: `Unknown resource: ${root}` };
   const field = rootResource.fields[relation];
   if (!field) return { error: `Unknown expansion ${relation} on resource ${root}` };
-  if (field.kind === "scalar") return { error: `Expansion ${relation} is not a relationship` };
+  if (field.kind !== "reference") return { error: `Expansion ${relation} is not a reference` };
   if (!graph.resource(field.resource)) return { error: `Expansion ${relation} targets unknown resource ${field.resource}` };
   return { resource: field.resource, field };
 }

@@ -10,8 +10,9 @@ export const sanitizedFederatoSchema: FederatoSchema = {
         accountName: { kind: "scalar", type: "string" },
         premium: { kind: "scalar", type: "number", nullable: true },
         effectiveDate: { kind: "scalar", type: "date" },
-        primaryLocation: { kind: "reference", resource: "Location" },
-        locations: { kind: "array", resource: "Location" },
+        primaryLocation: { kind: "reference", resource: "Location", cardinality: "one" },
+        locations: { kind: "reference", resource: "Location", cardinality: "many" },
+        dates: { kind: "object", fields: { effective: { kind: "scalar", type: "date" } } },
       },
     },
     Location: {
@@ -20,7 +21,8 @@ export const sanitizedFederatoSchema: FederatoSchema = {
         id: { kind: "scalar", type: "string" },
         state: { kind: "scalar", type: "string" },
         tiv: { kind: "scalar", type: "number" },
-        buildings: { kind: "array", resource: "Building" },
+        buildings: { kind: "reference", resource: "Building", cardinality: "many" },
+        hazardTags: { kind: "array", item: { kind: "scalar", type: "string" } },
       },
     },
     Building: {

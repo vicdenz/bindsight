@@ -14,9 +14,10 @@ describe("Federato query validation", () => {
     expect(result.ok).toBe(true);
     expect(lowerQueryPlan(validPolicyPlan, sanitizedFederatoSchema)).toMatchObject({
       resource: "Policy",
-      fields: ["id", "accountName", "premium"],
-      page: { limit: 50 },
-      expansions: [{ relation: "locations", fields: ["id", "state", "tiv"] }],
+      where: { premium: { $gte: 50_000 } },
+      expand: { locations: true },
+      select: { id: true, accountName: true, premium: true, locations: { id: true, state: true, tiv: true } },
+      pagination: { limit: 50 },
     });
   });
 
@@ -55,6 +56,17 @@ describe("Federato query validation", () => {
     const before = structuredClone(validPolicyPlan);
     const lowered = lowerQueryPlan(validPolicyPlan, sanitizedFederatoSchema);
     expect(validPolicyPlan).toEqual(before);
-    expect(lowered.filters).not.toBe(validPolicyPlan.filters);
+    expect(lowered.select).not.toBe(validPolicyPlan.select);
+  });
+
+  it("maps internal cursor pagination to the documented offset", () => {
+    expect(lowerQueryPlan(changed({ pagination: { limit: 10, cursor: "20" } }), sanitizedFederatoSchema).pagination)
+      .toEqual({ limit: 10, offset: 20 });
+    expect(() => lowerQueryPlan(changed({ pagination: { limit: 10, cursor: "opaque" } }), sanitizedFederatoSchema))
+      .toThrow("non-negative integer offset");
+  });
+
+  it("allows documented dot paths through embedded objects", () => {
+    expect(validateQueryPlan(changed({ select: ["dates.effective"], expansions: [] }), sanitizedFederatoSchema).ok).toBe(true);
   });
 });
