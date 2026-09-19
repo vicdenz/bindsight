@@ -1,0 +1,38 @@
+{
+  "name": "bindsight",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration --passWithNoTests",
+    "eval:rules": "vitest run evals/rules --passWithNoTests",
+    "eval:queries": "vitest run evals/queries --passWithNoTests",
+    "eval:providers": "vitest run evals/providers --passWithNoTests",
+    "eval:reviewer": "vitest run evals/reviewer --passWithNoTests",
+    "audit:cost": "vitest run evals/cost --passWithNoTests",
+    "test:e2e": "vitest run tests/e2e --passWithNoTests",
+    "audit:secrets": "node scripts/audit-secrets.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run test:unit && npm run test:integration && npm run eval:rules && npm run eval:queries && npm run eval:providers && npm run eval:reviewer && npm run audit:cost && npm run audit:secrets"
+  },
+  "dependencies": {
+    "next": "^16.3.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "4.1.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.3.1",
+    "@types/node": "24.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "9.35.0",
+    "eslint-config-next": "15.5.3",
+    "typescript": "5.9.2",
+    "vitest": "^5.0.1"
+  }
+}
