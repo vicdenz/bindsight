@@ -1,0 +1,23 @@
+# Dependencies and builds
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Logs and editor files
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# Local demo artifacts
+artifacts/
+recordings/
