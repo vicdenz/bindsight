@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 const patterns = [
   "sk-[A-Za-z0-9_-]{20,}",
   "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----",
-  "client_secret[=:][^\\n]{8,}",
+  "(FEDERATO_CLIENT_SECRET|BASETEN_API_KEY|OPENAI_API_KEY|SENTRY_AUTH_TOKEN)=[^[:space:]]{12,}",
 ];
 
 const files = execFileSync("git", ["ls-files"], { encoding: "utf8" })

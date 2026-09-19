@@ -15,4 +15,15 @@ Load the supporting references only when the active task needs them:
 - [Demo and Prize Reference](docs/planning/Federato_BindSight_Demo_and_Prizes.md)
 - [Research and Architecture Rationale](docs/planning/Federato_BindSight_Research.md)
 
-The application has not been scaffolded yet. The Primary Build Specification is the source of truth for implementation.
+## Current implementation
+
+The project now includes a Next.js workbench, deterministic appetite evaluator, evidence ledger, cached five-tier demo, Federato Auth0/query adapter, and OpenAI reviewer budget/tool guards. Start it with:
+
+```bash
+npm install
+npm run dev
+```
+
+Without provider credentials the UI uses clearly labeled synthetic cached packets. Add the server-only variables from `.env.example` to enable later live-provider integration.
+
+Run the non-destructive checks with `npm run verify`.
