@@ -29,16 +29,21 @@ export function ReviewerPanel({ submissionId }: Readonly<{ submissionId: string 
   }
 
   return (
-    <section aria-labelledby="reviewer-heading">
-      <h2 id="reviewer-heading">Senior Reviewer</h2>
+    <section className="reviewer-panel" aria-labelledby="reviewer-heading">
+      <div className="reviewer-intro">
+        <p className="page-kicker">Second look</p>
+        <h2 id="reviewer-heading">Ask a senior reviewer</h2>
+        <p>Question this decision using only the evidence already attached to the packet.</p>
+      </div>
       <form onSubmit={submit}>
-        <label htmlFor="reviewer-question">Ask about the cached decision evidence</label>
-        <textarea id="reviewer-question" name="question" required maxLength={2000} rows={3} />
-        <p><button type="submit" disabled={pending}>{pending ? "Reviewing…" : "Ask reviewer"}</button></p>
+        <label htmlFor="reviewer-question">Question for the reviewer</label>
+        <textarea id="reviewer-question" name="question" required maxLength={2000} rows={3} placeholder="Which evidence had the greatest effect on this treatment?" />
+        <button type="submit" disabled={pending}>{pending ? "Reviewing evidence…" : "Ask reviewer"}</button>
       </form>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert" className="notice notice-error">{error}</p>}
       {response && (
-        <div aria-live="polite">
+        <div className="reviewer-response" aria-live="polite">
+          <p className="page-kicker">Reviewer response</p>
           <p>{response.answer}</p>
           {response.citedIds.length > 0 && <p>Citations: {response.citedIds.join(", ")}</p>}
           <small>Model: {response.model}; tool calls: {response.toolCalls.length}</small>

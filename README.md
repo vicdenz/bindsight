@@ -13,6 +13,8 @@ The home page first segments the portfolio into new-property candidates, renewal
 - a next-best question when critical information is missing; and
 - an AI reviewer scoped to that decision packet.
 
+The decision queue can be searched by account, submission ID, line, or state and filtered by treatment without changing the server-ranked source data. Its responsive layout turns each table row into a labeled record on narrow screens while preserving semantic table markup for assistive technology.
+
 Deterministic rules make the underwriting recommendation. The language model explains and reviews the result; it cannot silently override the rules or cite evidence that is not in the packet.
 
 ## Data flow

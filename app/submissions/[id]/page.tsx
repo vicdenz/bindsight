@@ -20,18 +20,21 @@ export default async function SubmissionPage({
 
   return (
     <>
-      <p><Link href={cohort.href}>← Back to {cohort.label}</Link></p>
+      <p className="back-link"><Link href={cohort.href}>Back to {cohort.label}</Link></p>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">Decision Packet</p>
+          <p className="page-kicker">Decision packet</p>
           <h1>{packet.submission.accountName}</h1>
-          <p>Submission {packet.submission.id} · {packet.submission.submissionType ?? "Unknown type"} · {packet.submission.lineOfBusiness ?? "Unknown line"}</p>
+          <p className="page-deck">Submission {packet.submission.id} / {packet.submission.submissionType ?? "Unknown type"} / {packet.submission.lineOfBusiness ?? "Unknown line"}</p>
         </div>
-        <span className="source-label">
-          {source === "live" && packet.analysis.mode === "retrospective" ? "Retrospective Federato assessment" : source === "live" ? "Live Federato data" : "Cached fallback data"}
-        </span>
+        <div className="source-ticket">
+          <span className="source-label">
+            {source === "live" && packet.analysis.mode === "retrospective" ? "Retrospective Federato assessment" : source === "live" ? "Live Federato data" : "Cached fallback data"}
+          </span>
+          <small>Evidence-backed assessment</small>
+        </div>
       </div>
-      {warning && <p role="alert" className="empty-state">Data notice: {warning}</p>}
+      {warning && <p role="alert" className="notice notice-warning"><strong>Data notice</strong>{warning}</p>}
       <DecisionPacketView packet={packet} />
       <ReviewerPanel submissionId={packet.submission.id} />
     </>

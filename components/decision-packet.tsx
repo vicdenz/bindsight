@@ -36,16 +36,16 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
   const packetJsonUrl = `/api/submissions/${encodeURIComponent(packet.submission.id)}/decision`;
 
   return (
-    <article>
-      <section className="summary" aria-labelledby="recommendation-heading">
-        <div>
-          <h2 id="recommendation-heading">Assessment</h2>
-          <p className={`tier tier-${packet.tier}`}>{tierLabels[packet.tier]}</p>
-          <p>{packet.explanation}</p>
-          <p>{packet.screening.reason}</p>
-          <p>
+    <article className="packet-sheet">
+      <section className="summary packet-summary" aria-labelledby="recommendation-heading">
+        <div className="assessment-copy">
+          <p className="page-kicker">Recommended treatment</p>
+          <h2 id="recommendation-heading"><span className={`tier tier-${packet.tier}`}>{tierLabels[packet.tier]}</span></h2>
+          <p className="assessment-lead">{packet.explanation}</p>
+          <p className="screening-reason">{packet.screening.reason}</p>
+          <p className="text-link-group">
             <Link href="/appetite">View appetite sources</Link>
-            {" · "}<a href={packetJsonUrl}>View packet JSON</a>
+            <a href={packetJsonUrl}>View packet JSON</a>
           </p>
         </div>
         {packet.screening.status === "evaluated" ? (
@@ -68,17 +68,18 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
       </section>
 
       {packet.nextBestQuestion && (
-        <section aria-labelledby="question-heading">
+        <section className="next-question" aria-labelledby="question-heading">
+          <p className="page-kicker">Unlock the next decision</p>
           <h2 id="question-heading">Next best question</h2>
           <p><strong>{packet.nextBestQuestion.question}</strong></p>
           <p>{packet.nextBestQuestion.rationale}</p>
         </section>
       )}
 
-      <section aria-labelledby="rules-heading">
-        <h2 id="rules-heading">Appetite checks</h2>
+      <section className="packet-section" aria-labelledby="rules-heading">
+        <header className="packet-section-heading"><h2 id="rules-heading">Appetite checks</h2><span>{packet.atoms.length} checks</span></header>
         <div className="table-scroll">
-          <table>
+          <table className="detail-table">
             <thead><tr><th scope="col">Status</th><th scope="col">Rule</th><th scope="col">Reason</th><th scope="col">Sources</th></tr></thead>
             <tbody>
               {packet.atoms.map((atom) => (
@@ -100,10 +101,10 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
         </div>
       </section>
 
-      <section aria-labelledby="evidence-heading">
-        <h2 id="evidence-heading">Evidence ledger</h2>
+      <section className="packet-section" aria-labelledby="evidence-heading">
+        <header className="packet-section-heading"><h2 id="evidence-heading">Evidence ledger</h2><span>{packet.evidence.length} entries</span></header>
         <div className="table-scroll">
-          <table>
+          <table className="detail-table evidence-table">
             <thead><tr><th scope="col">ID</th><th scope="col">Source</th><th scope="col">Field</th><th scope="col">Normalized</th><th scope="col">Raw source value</th></tr></thead>
             <tbody>
               {packet.evidence.map((item) => (
@@ -121,9 +122,9 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
       </section>
 
       {packet.calculations.length > 0 && (
-        <section aria-labelledby="calculations-heading">
-          <h2 id="calculations-heading">Calculations</h2>
-          <ul>
+        <section className="packet-section" aria-labelledby="calculations-heading">
+          <header className="packet-section-heading"><h2 id="calculations-heading">Calculations</h2><span>{packet.calculations.length} derived values</span></header>
+          <ul className="calculation-list">
             {packet.calculations.map((calculation) => (
               <li key={calculation.id} id={calculation.id}>
                 <a href={`#${encodeURIComponent(calculation.id)}`}><code>{calculation.id}</code></a>: {calculation.operation}(
@@ -135,7 +136,7 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
       )}
 
       {(packet.qualityIssues.length > 0 || packet.assumptions.length > 0) && (
-        <section aria-labelledby="caveats-heading">
+        <section className="notice notice-caveat" aria-labelledby="caveats-heading">
           <h2 id="caveats-heading">Data quality and assumptions</h2>
           <ul>
             {packet.qualityIssues.map((issue) => <li key={`issue-${issue}`}>Issue: {issue}</li>)}
@@ -144,8 +145,8 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
         </section>
       )}
 
-      <section id="source-context" aria-labelledby="source-context-heading">
-        <h2 id="source-context-heading">Source context</h2>
+      <section className="packet-section source-context" id="source-context" aria-labelledby="source-context-heading">
+        <header className="packet-section-heading"><h2 id="source-context-heading">Source context</h2><span>Audit trail</span></header>
         <p>
           Evidence marked Federato was retrieved from the expanded policy/submission graph. Derived values retain their raw inputs above.
           {" "}<a href={packetJsonUrl}>Open this complete decision packet as JSON</a> or{" "}
