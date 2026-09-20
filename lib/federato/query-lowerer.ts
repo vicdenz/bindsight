@@ -4,7 +4,8 @@ import { validateQueryPlan } from "./query-validator";
 type WireOperator = "$eq" | "$ne" | "$in" | "$gt" | "$gte" | "$lt" | "$lte";
 export type FederatoClause = Record<string, unknown>;
 export type FederatoSelect = Record<string, true | Record<string, unknown>>;
-export type FederatoQueryRequest = Readonly<{ resource: string; where?: FederatoClause; expand?: Record<string, true>; select?: FederatoSelect; pagination?: Readonly<{ limit: number; offset?: number }> }>;
+export interface FederatoExpand { [field: string]: true | FederatoExpand }
+export type FederatoQueryRequest = Readonly<{ resource: string; where?: FederatoClause; expand?: FederatoExpand; select?: FederatoSelect; pagination?: Readonly<{ limit: number; offset?: number }> }>;
 const OPERATOR: Record<QueryPlan["filters"][number]["operator"], WireOperator> = { eq: "$eq", neq: "$ne", in: "$in", gt: "$gt", gte: "$gte", lt: "$lt", lte: "$lte" };
 function projection(paths: readonly string[]): FederatoSelect { return Object.fromEntries(paths.map((path) => [path, true])); }
 

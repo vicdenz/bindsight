@@ -17,14 +17,20 @@ describe("reviewer citation validation", () => {
     ).valid).toBe(true);
   });
 
-  it("rejects invented and duplicate citations", () => {
+  it("rejects invented citations while allowing a source to support multiple claims", () => {
     const result = validateReviewerCitations(
       { citedIds: ["E-404", "E-1", "E-1"], insufficientEvidence: false },
       [packet],
     );
     expect(result.valid).toBe(false);
     expect(result.errors).toContain("Unknown citation ID: E-404");
-    expect(result.errors).toContain("Duplicate citation ID: E-1");
+    expect(result.errors).not.toContain("Duplicate citation ID: E-1");
+  });
+
+  it("accepts repeated known citation IDs", () => {
+    expect(validateReviewerCitations(
+      { citedIds: ["E-1", "E-1"], insufficientEvidence: false }, [packet],
+    ).valid).toBe(true);
   });
 
   it("requires citations unless the answer reports insufficient evidence", () => {

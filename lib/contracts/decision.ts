@@ -50,7 +50,7 @@ export const evidenceItemSchema = z.object({
 
 export const calculationSchema = z.object({
   id: z.string().min(1),
-  operation: z.enum(["sum", "count", "ratio", "difference", "identity"]),
+  operation: z.enum(["sum", "count", "ratio", "difference", "identity", "min"]),
   inputIds: z.array(z.string().min(1)).min(1),
   unit: z.string().min(1),
   result: z.number(),

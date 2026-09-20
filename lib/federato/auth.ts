@@ -3,6 +3,7 @@ export type FederatoCredentials = { clientId: string; clientSecret: string; auth
 export type FederatoAccessToken = { value: string; expiresAt: number };
 export interface FederatoTokenProvider { getToken(options?: { forceRefresh?: boolean }): Promise<FederatoAccessToken> }
 export type FetchLike = (input: string | URL, init?: RequestInit) => Promise<Response>;
+export const FEDERATO_REQUEST_TIMEOUT_MS = 10_000;
 function required(env: NodeJS.ProcessEnv, name: string): string { const value = env[name]; if (!value) throw new Error(`Missing server environment variable: ${name}`); return value; }
 export function readFederatoCredentials(env: NodeJS.ProcessEnv = process.env): FederatoCredentials {
   if (typeof window !== "undefined") throw new Error("Federato credentials are server-only");
@@ -13,7 +14,7 @@ export class Auth0FederatoTokenProvider implements FederatoTokenProvider {
   constructor(private readonly credentials: FederatoCredentials, private readonly fetcher: FetchLike = fetch) {}
   async getToken(options: { forceRefresh?: boolean } = {}): Promise<FederatoAccessToken> {
     if (!options.forceRefresh && this.cached && this.cached.expiresAt - Date.now() > 30_000) return this.cached;
-    const response = await this.fetcher(this.credentials.authUrl, { method: "POST", headers: { "Content-Type": "application/json" },
+    const response = await this.fetcher(this.credentials.authUrl, { method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(FEDERATO_REQUEST_TIMEOUT_MS),
       body: JSON.stringify({ client_id: this.credentials.clientId, client_secret: this.credentials.clientSecret, audience: FEDERATO_AUDIENCE, grant_type: "client_credentials" }) });
     const body: unknown = await response.json().catch(() => undefined);
     if (!response.ok) throw new Error(`Federato authentication failed with status ${response.status}`);

@@ -1,4 +1,4 @@
-import type { FetchLike, FederatoTokenProvider } from "./auth";
+import { FEDERATO_REQUEST_TIMEOUT_MS, type FetchLike, type FederatoTokenProvider } from "./auth";
 import type { FederatoQueryRequest } from "./query-lowerer";
 import { normalizeFederatoSchema, type FederatoSchema } from "./schema";
 
@@ -27,8 +27,14 @@ export function normalizeQueryPage<T>(input: unknown): FederatoQueryPage<T> {
   const value = input as Record<string, unknown>;
   if (typeof value.total !== "number" || !Number.isFinite(value.total) || value.total < 0) throw new Error("Federato query response total must be a non-negative number");
   if (Array.isArray(value.groups)) return { total: value.total, records: value.groups as T[], groups: value.groups as T[] };
-  const records = Array.isArray(value.records) ? value.records : Array.isArray(value.data) ? value.data : undefined;
-  if (!records) throw new Error("Federato query response must contain records, data, or groups");
+  const records = Array.isArray(value.records)
+    ? value.records
+    : Array.isArray(value.data)
+      ? value.data
+      : Array.isArray(value.results)
+        ? value.results
+        : undefined;
+  if (!records) throw new Error("Federato query response must contain records, data, results, or groups");
   return { total: value.total, records: records as T[] };
 }
 
@@ -44,7 +50,7 @@ export class HttpFederatoTransport implements FederatoTransport {
     return this.post(token, { action: "query", payload: request }) as Promise<FederatoTransportResult<T>>;
   }
   private async post(token: string, envelope: { action: "schema" } | { action: "query"; payload: FederatoQueryRequest }): Promise<FederatoTransportResult<unknown>> {
-    const response = await this.fetcher(this.handlerUrl, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(envelope) });
+    const response = await this.fetcher(this.handlerUrl, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(envelope), signal: AbortSignal.timeout(FEDERATO_REQUEST_TIMEOUT_MS) });
     const body: unknown = await response.json().catch(async () => response.text().catch(() => undefined));
     if (!response.ok) return { status: response.status, message: typeof body === "string" ? body : `Federato request failed with status ${response.status}` };
     return { status: response.status, data: unwrapWorkflowEnvelope(body) };

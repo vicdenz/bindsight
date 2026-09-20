@@ -2,13 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DecisionPacketView } from "@/components/decision-packet";
 import { ReviewerPanel } from "@/components/reviewer-panel";
-import { getDemoDecisionPacket } from "@/lib/cache/demo-snapshot";
+import { getDecisionPacket } from "@/lib/analysis/live";
+
+export const dynamic = "force-dynamic";
 
 export default async function SubmissionPage({
   params,
 }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
-  const packet = getDemoDecisionPacket(id);
+  const { packet, source, warning } = await getDecisionPacket(id);
   if (!packet) notFound();
 
   return (
@@ -21,11 +23,12 @@ export default async function SubmissionPage({
           <p>Submission {packet.submission.id}</p>
         </div>
         <span className="source-label">
-          {packet.analysis.source === "cached" ? "Cached demo data" : "Live data"}
+          {source === "live" ? "Live Federato data" : "Cached fallback data"}
         </span>
       </div>
+      {warning && <p role="alert" className="empty-state">Data notice: {warning}</p>}
       <DecisionPacketView packet={packet} />
-      <ReviewerPanel />
+      <ReviewerPanel submissionId={packet.submission.id} />
     </>
   );
 }

@@ -7,7 +7,15 @@ export type FederatoField = FederatoScalarField | FederatoObjectField | Federato
 export type FederatoResource = { name: string; fields: Record<string, FederatoField> };
 export type FederatoSchema = { version?: string; resources: Record<string, FederatoResource> };
 
-type RawField = { type?: unknown; fields?: unknown; itemSchema?: unknown; resource?: unknown; cardinality?: unknown; nullable?: unknown };
+type RawField = {
+  type?: unknown;
+  fields?: unknown;
+  itemSchema?: unknown;
+  itemType?: unknown;
+  resource?: unknown;
+  cardinality?: unknown;
+  nullable?: unknown;
+};
 
 function normalizeFields(value: unknown, context: string): Record<string, FederatoField> {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${context}.fields must be an object`);
@@ -18,7 +26,10 @@ function normalizeField(value: unknown, context: string): FederatoField {
   const raw = value as RawField;
   const nullable = raw.nullable === true || undefined;
   if (raw.type === "object") return { kind: "object", fields: normalizeFields(raw.fields, context), nullable };
-  if (raw.type === "array") return { kind: "array", item: normalizeField(raw.itemSchema, `${context}[]`), nullable };
+  if (raw.type === "array") {
+    const itemDescriptor = raw.itemSchema ?? (typeof raw.itemType === "string" ? { type: raw.itemType } : undefined);
+    return { kind: "array", item: normalizeField(itemDescriptor, `${context}[]`), nullable };
+  }
   if (raw.type === "reference") {
     if (typeof raw.resource !== "string" || !raw.resource) throw new Error(`${context}.resource must be a non-empty string`);
     if (raw.cardinality !== "one" && raw.cardinality !== "many") throw new Error(`${context}.cardinality must be one or many`);

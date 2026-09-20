@@ -12,6 +12,18 @@ export type NormalizedSubmission = {
   supportedConstructionPercentage: number | null;
   fiveYearLossValue: number | null;
   receivedAt: string;
+  fieldEvidence?: Partial<Record<NormalizedField, NormalizedFieldEvidence>>;
+};
+
+export type NormalizedField = Exclude<keyof NormalizedSubmission, "id" | "accountName" | "receivedAt" | "fieldEvidence">;
+
+export type NormalizedFieldEvidence = {
+  resource: string;
+  recordId: string;
+  fieldPath: string;
+  rawValue: unknown;
+  provenance: "federato" | "derived";
+  calculation?: { operation: "sum" | "ratio" | "min"; unit: string };
 };
 
 export type AnalysisRun = {

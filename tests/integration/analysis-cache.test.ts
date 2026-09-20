@@ -1,4 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("../../lib/analysis/live", async () => {
+  const cache = await import("../../lib/cache/analysis");
+  return {
+    getDecisionData: async () => cache.analyzeCachedSubmissions(),
+    getDecisionPacket: async (id: string) => ({ packet: cache.getCachedDecisionPacket(id), source: "cached" as const }),
+  };
+});
 
 import { POST } from "../../app/api/analyze/route";
 import { GET } from "../../app/api/submissions/[submissionId]/decision/route";
@@ -6,7 +14,7 @@ import { decisionPacketSchema } from "../../lib/contracts";
 
 describe("fixture-backed analysis API", () => {
   it("returns five valid cached packets spanning every action tier", async () => {
-    const response = POST();
+    const response = await POST();
     const body = await response.json();
     expect(response.status).toBe(200);
     expect(body.source).toBe("cached");

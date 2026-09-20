@@ -53,6 +53,10 @@ export function calculate(
       if (numbers.length !== 1) throw new RangeError("identity requires exactly one input");
       result = numbers[0];
       break;
+    case "min":
+      if (numbers.length === 0) throw new RangeError("min requires at least one input");
+      result = Math.min(...numbers);
+      break;
   }
 
   return calculationSchema.parse({ id, operation, inputIds: inputs.map((item) => item.id), unit, result });

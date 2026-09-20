@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getDemoDecisionPackets } from "@/lib/cache/demo-snapshot";
 import { OpenAIResponsesReviewerProvider, UnavailableReviewerProvider } from "@/lib/openai/client";
 import { BudgetLedger } from "@/lib/openai/budget";
 import { runReviewer } from "@/lib/openai/reviewer";
+import { getDecisionData } from "@/lib/analysis/live";
 
 export const dynamic = "force-dynamic";
 
-const requestSchema = z.object({ question: z.string().trim().min(1).max(2_000) }).strict();
+const requestSchema = z.object({
+  question: z.string().trim().min(1).max(2_000),
+  submissionId: z.string().trim().min(1).optional(),
+}).strict();
 const eventLedger = new BudgetLedger();
 
 function configuredNumber(name: string): number {
@@ -27,9 +30,19 @@ export async function POST(request: Request) {
         outputCostPerMillionUsd: configuredNumber("OPENAI_OUTPUT_COST_PER_MILLION_USD"),
       })
     : new UnavailableReviewerProvider();
+  const decisionData = await getDecisionData();
+  const packets = parsed.data.submissionId
+    ? decisionData.packets.filter((packet) => packet.submission.id === parsed.data.submissionId)
+    : decisionData.packets;
+  if (parsed.data.submissionId && packets.length === 0) {
+    return NextResponse.json(
+      { error: "Decision packet not found", submissionId: parsed.data.submissionId, source: decisionData.source },
+      { status: 404 },
+    );
+  }
   const response = await runReviewer(parsed.data.question, {
     provider,
-    packets: getDemoDecisionPackets(),
+    packets,
     ledger: eventLedger,
     models: {
       fast: process.env.OPENAI_FAST_MODEL ?? "gpt-5.6-luna",

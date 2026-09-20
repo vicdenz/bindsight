@@ -97,5 +97,6 @@ describe("documented Federato HTTP boundary", () => {
   it("normalizes documented group totals and paginated records", () => {
     expect(normalizeQueryPage({ total: 2, groups: [{ state: "CA" }] })).toEqual({ total: 2, records: [{ state: "CA" }], groups: [{ state: "CA" }] });
     expect(normalizeQueryPage({ total: 42, data: [{ id: 1 }] })).toEqual({ total: 42, records: [{ id: 1 }] });
+    expect(normalizeQueryPage({ total: 113, results: [{ id: 1 }], resource: "Policy" })).toEqual({ total: 113, records: [{ id: 1 }] });
   });
 });

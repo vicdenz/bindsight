@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { analyzeCachedSubmissions } from "../../../lib/cache/analysis";
+import { getDecisionData } from "../../../lib/analysis/live";
 
 export const dynamic = "force-dynamic";
 
-export function POST() {
-  return NextResponse.json(analyzeCachedSubmissions());
+export async function POST() {
+  return NextResponse.json(await getDecisionData());
 }

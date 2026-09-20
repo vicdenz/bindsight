@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import type { ReviewerResponse } from "@/lib/contracts";
 
-export function ReviewerPanel() {
+export function ReviewerPanel({ submissionId }: Readonly<{ submissionId: string }>) {
   const [response, setResponse] = useState<ReviewerResponse | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -17,7 +17,7 @@ export function ReviewerPanel() {
       const result = await fetch("/api/review", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: data.get("question") }),
+        body: JSON.stringify({ question: data.get("question"), submissionId }),
       });
       if (!result.ok) throw new Error("The reviewer request was not accepted.");
       setResponse(await result.json() as ReviewerResponse);

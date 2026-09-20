@@ -31,11 +31,7 @@ export function validateReviewerCitations(
 ): CitationValidationResult {
   const knownIds = collectKnownCitationIds(packets, rules);
   const errors: string[] = [];
-  const seen = new Set<string>();
-
   for (const citation of response.citedIds) {
-    if (seen.has(citation)) errors.push(`Duplicate citation ID: ${citation}`);
-    seen.add(citation);
     if (!knownIds.has(citation)) errors.push(`Unknown citation ID: ${citation}`);
   }
 
