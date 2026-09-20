@@ -16,7 +16,7 @@ describe("cached analysis orchestration", () => {
     expect(created.source).toBe("cached");
     expect(created.processed).toBe(5);
     expect(created.packets.every((packet: unknown) => decisionPacketSchema.parse(packet).atoms.length === 8)).toBe(true);
-    expect(new Set(created.packets.map((packet: { tier: string }) => packet.tier))).toEqual(new Set(["review_now", "standard_review", "request_information", "manual_review", "likely_decline"]));
+    expect(new Set(created.packets.map((packet: { tier: string }) => packet.tier))).toEqual(new Set(["review_now", "standard_review", "request_information", "manual_review", "outside_appetite"]));
 
     const response = await getRun(new Request("http://localhost"), { params: Promise.resolve({ runId: created.id }) });
     expect(response.status).toBe(200);

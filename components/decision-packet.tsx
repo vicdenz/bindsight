@@ -6,7 +6,7 @@ const tierLabels: Record<ActionTier, string> = {
   standard_review: "Standard review",
   request_information: "Request information",
   manual_review: "Manual review",
-  likely_decline: "Outside appetite",
+  outside_appetite: "Outside appetite",
   screened_out: "Renewal workflow",
   not_evaluated: "No matching profile",
 };
@@ -53,6 +53,8 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
             <div><dt>Target alignment</dt><dd>{percentage(packet.score.targetAlignment)}</dd></div>
             <div><dt>Evidence completeness</dt><dd>{percentage(packet.score.evidenceCompleteness)}</dd></div>
             <div><dt>Premium opportunity</dt><dd>{percentage(packet.score.premiumOpportunity)}</dd></div>
+            <div><dt>Source status</dt><dd>{packet.submission.sourceStatus ?? "Unknown"}</dd></div>
+            <div><dt>Assessment mode</dt><dd>{packet.analysis.mode}</dd></div>
             <div><dt>Analysis time</dt><dd>{packet.analysis.latencyMs} ms</dd></div>
           </dl>
         ) : (

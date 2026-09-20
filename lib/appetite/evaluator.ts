@@ -105,7 +105,7 @@ export function evaluateRule(input: RuleEvaluationInput): DecisionAtom {
 }
 
 export function determineActionTier(atoms: readonly DecisionAtom[], rules: readonly AppetiteRule[] = []): ActionTier {
-  if (atoms.some((item) => item.hardGate && item.status === "fail")) return "likely_decline";
+  if (atoms.some((item) => item.hardGate && item.status === "fail")) return "outside_appetite";
   if (atoms.some((item) => item.hardGate && item.status === "conflict")) return "manual_review";
 
   const rulesById = new Map(rules.map((rule) => [rule.id, rule]));

@@ -42,7 +42,7 @@ describe("messy evidence and precedence", () => {
     expect([missing.status, conflict.status, failure.status]).toEqual(["missing", "conflict", "fail"]);
     expect(determineActionTier([missing])).toBe("request_information");
     expect(determineActionTier([conflict])).toBe("manual_review");
-    expect(determineActionTier([failure, missing])).toBe("likely_decline");
+    expect(determineActionTier([failure, missing])).toBe("outside_appetite");
   });
 
   it("normalizes numeric strings without treating zero as missing", () => {

@@ -13,5 +13,9 @@ export async function GET(_request: Request, context: RouteContext) {
       { status: 404 },
     );
   }
-  return NextResponse.json(packet, { headers: { "X-BindSight-Data-Source": source } });
+  return NextResponse.json(packet, { headers: {
+    "Cache-Control": "private, no-store",
+    "X-BindSight-Data-Source": source,
+    "X-BindSight-Assessment-Mode": packet.analysis.mode,
+  } });
 }

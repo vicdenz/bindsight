@@ -3,7 +3,7 @@ import type { DecisionPacket } from "../contracts";
 export function simulateStateConcentration(packets: readonly DecisionPacket[], submissionId: string) {
   const candidate = packets.find((packet) => packet.submission.id === submissionId);
   if (!candidate?.submission.primaryState) return null;
-  const eligible = packets.filter((packet) => !["likely_decline", "screened_out", "not_evaluated"].includes(packet.tier) && packet.submission.totalInsuredValue !== null);
+  const eligible = packets.filter((packet) => !["outside_appetite", "screened_out", "not_evaluated"].includes(packet.tier) && packet.submission.totalInsuredValue !== null);
   const state = candidate.submission.primaryState;
   const existing = eligible.filter((packet) => packet.submission.id !== submissionId);
   const totalBefore = existing.reduce((sum, packet) => sum + (packet.submission.totalInsuredValue ?? 0), 0);

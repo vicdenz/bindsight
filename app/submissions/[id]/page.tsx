@@ -28,7 +28,7 @@ export default async function SubmissionPage({
           <p>Submission {packet.submission.id} · {packet.submission.submissionType ?? "Unknown type"} · {packet.submission.lineOfBusiness ?? "Unknown line"}</p>
         </div>
         <span className="source-label">
-          {source === "live" ? "Live Federato data" : "Cached fallback data"}
+          {source === "live" && packet.analysis.mode === "retrospective" ? "Retrospective Federato assessment" : source === "live" ? "Live Federato data" : "Cached fallback data"}
         </span>
       </div>
       {warning && <p role="alert" className="empty-state">Data notice: {warning}</p>}

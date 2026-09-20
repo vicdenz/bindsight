@@ -54,7 +54,7 @@ describe("Baseten structured lanes", () => {
 
   it("rejects unknown citations, unsupported numbers, and tier changes", () => {
     const packet = demoDecisionPackets[0];
-    const result = validateExplanation({ text: "Premium is $999 [UNKNOWN].", citations: ["UNKNOWN"], tier: "likely_decline" }, packet);
+    const result = validateExplanation({ text: "Premium is $999 [UNKNOWN].", citations: ["UNKNOWN"], tier: "outside_appetite" }, packet);
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.errors.join(" ")).toContain("Unknown citation");

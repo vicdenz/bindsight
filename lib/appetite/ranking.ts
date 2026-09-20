@@ -5,7 +5,7 @@ const TIER_ORDER: Record<ActionTier, number> = {
   standard_review: 1,
   request_information: 2,
   manual_review: 3,
-  likely_decline: 4,
+  outside_appetite: 4,
   screened_out: 5,
   not_evaluated: 6,
 };

@@ -116,7 +116,7 @@ export function analyzeSubmission(submission: NormalizedSubmission, rules: reado
     nextBestQuestion: missingField && prompt ? { field: missingField, question: prompt.question, rationale: prompt.rationale, possibleTierChange: true } : null,
     qualityIssues: atoms.filter((atom) => atom.status === "missing").map((atom) => `Missing evidence for ${rules.find((rule) => rule.id === atom.ruleId)?.concept ?? atom.ruleId}.`),
     assumptions: [...conflictAtoms.map((atom) => atom.reason), ...aggregationAssumptions], portfolioDelta: null,
-    analysis: { status: "complete", latencyMs: 0, source: options.source ?? "cached" },
+    analysis: { status: "complete", latencyMs: 0, source: options.source ?? "cached", mode: options.source === "live" && submission.sourceStatus === "bound" ? "retrospective" : options.source === "live" ? "intake" : "demo" },
   });
 }
 

@@ -57,6 +57,8 @@ function packetSummary(packet: DecisionPacket) {
   return {
     submission: packet.submission,
     tier: packet.tier,
+    screening: packet.screening,
+    analysis: packet.analysis,
     score: packet.score,
     explanation: packet.explanation,
     atomIds: packet.atoms.map((atom) => atom.id),

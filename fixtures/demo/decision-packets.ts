@@ -111,7 +111,7 @@ function createPacket(seed: DemoSeed): DecisionPacket {
     qualityIssues: missingYear ? ["Primary building year is unavailable."] : [],
     assumptions: seed.year === 1990 ? ["The appetite guide does not classify exactly 1990."] : [],
     portfolioDelta: null,
-    analysis: { status: "complete", latencyMs: 0, source: "cached" },
+    analysis: { status: "complete", latencyMs: 0, source: "cached", mode: "demo" },
   });
 }
 

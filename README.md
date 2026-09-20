@@ -67,12 +67,29 @@ curl http://localhost:3000/api/providers/health
 
 - `GET /api/health` — service liveness.
 - `GET /api/providers/health` — configuration readiness.
-- `POST /api/analyze` — current live decision queue or labeled fallback.
+- `GET or POST /api/analyze` — versioned decision-queue response with cohort/tier summaries, profile metadata, and live or labeled fallback packets.
 - `GET /api/submissions/:submissionId/decision` — one current decision packet.
 - `POST /api/review` — evidence-grounded reviewer answer, optionally scoped by `submissionId`.
 - `POST /api/schema/sync` — live Federato schema discovery.
 
 The browser never receives provider credentials and never calls Federato or OpenAI directly.
+
+The queue contract currently reports `schemaVersion: "1.0"`. Frontend code should use `summary.cohorts` for section counts, `summary.tiers` for outcome counts, `profiles` for source attribution, and each packet’s `screening` and `analysis.mode` fields rather than recreating routing logic in the browser.
+
+```json
+{
+  "schemaVersion": "1.0",
+  "source": "live",
+  "summary": {
+    "total": 113,
+    "cohorts": { "evaluated": 20, "renewal": 48, "unsupported_line": 45 },
+    "tiers": { "standard_review": 1, "outside_appetite": 19, "screened_out": 48, "not_evaluated": 45 },
+    "assessmentMode": "retrospective"
+  },
+  "profiles": [],
+  "packets": []
+}
+```
 
 ## Validation
 

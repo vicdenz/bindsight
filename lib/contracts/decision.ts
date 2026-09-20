@@ -14,7 +14,7 @@ export const actionTierSchema = z.enum([
   "standard_review",
   "request_information",
   "manual_review",
-  "likely_decline",
+  "outside_appetite",
   "screened_out",
   "not_evaluated",
 ]);
@@ -116,6 +116,7 @@ export const decisionPacketSchema = z.object({
     status: z.enum(["queued", "analyzing", "complete", "recoverable_error"]),
     latencyMs: z.number().nonnegative(),
     source: z.enum(["live", "cached"]),
+    mode: z.enum(["retrospective", "demo", "intake"]),
   }),
 });
 

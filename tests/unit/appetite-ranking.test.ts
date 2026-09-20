@@ -9,14 +9,14 @@ function packet(id: string, tier: DecisionPacket["tier"], targetAlignment = 0.5)
     screening: { status: "evaluated", profileId: "commercial-property-2025.1", reason: "Fixture." },
     score: { targetAlignment, evidenceCompleteness: 1, portfolioContribution: 0, premiumOpportunity: 0.5 },
     explanation: "Fixture packet.", nextBestQuestion: null, qualityIssues: [], assumptions: [], portfolioDelta: null,
-    analysis: { status: "complete", latencyMs: 1, source: "cached" },
+    analysis: { status: "complete", latencyMs: 1, source: "cached", mode: "demo" },
   };
 }
 
 describe("decision ranking", () => {
   it("orders tiers before score and uses the documented tier sequence", () => {
     const ranked = rankDecisionPackets([
-      packet("decline", "likely_decline", 1), packet("manual", "manual_review", 1),
+      packet("decline", "outside_appetite", 1), packet("manual", "manual_review", 1),
       packet("info", "request_information", 1), packet("standard", "standard_review", 0),
       packet("now", "review_now", 0), packet("renewal", "screened_out", 1),
       packet("unsupported", "not_evaluated", 1),
