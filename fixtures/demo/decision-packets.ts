@@ -79,6 +79,9 @@ function createPacket(seed: DemoSeed): DecisionPacket {
     submission: {
       id: seed.id,
       accountName: seed.accountName,
+      submissionType: "New Business",
+      lineOfBusiness: "Property",
+      sourceStatus: null,
       primaryState: seed.state,
       premium: seed.premium,
       totalInsuredValue: seed.totalInsuredValue,
@@ -88,6 +91,11 @@ function createPacket(seed: DemoSeed): DecisionPacket {
     evidence: allEvidence,
     calculations: [],
     tier,
+    screening: {
+      status: "evaluated",
+      profileId: "commercial-property-2025.1",
+      reason: "New property business is eligible for the commercial-property appetite assessment.",
+    },
     score: {
       ...scores,
       portfolioContribution: tier === "review_now" ? 0.2 : 0,

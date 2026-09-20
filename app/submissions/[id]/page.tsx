@@ -12,15 +12,20 @@ export default async function SubmissionPage({
   const { id } = await params;
   const { packet, source, warning } = await getDecisionPacket(id);
   if (!packet) notFound();
+  const cohort = packet.screening.status === "renewal"
+    ? { href: "/#renewals", label: "renewals" }
+    : packet.screening.status === "unsupported_line"
+      ? { href: "/#unsupported-lines", label: "other lines" }
+      : { href: "/#candidates", label: "new property candidates" };
 
   return (
     <>
-      <p><Link href="/">← Back to decision queue</Link></p>
+      <p><Link href={cohort.href}>← Back to {cohort.label}</Link></p>
       <div className="page-heading">
         <div>
           <p className="eyebrow">Decision Packet</p>
           <h1>{packet.submission.accountName}</h1>
-          <p>Submission {packet.submission.id}</p>
+          <p>Submission {packet.submission.id} · {packet.submission.submissionType ?? "Unknown type"} · {packet.submission.lineOfBusiness ?? "Unknown line"}</p>
         </div>
         <span className="source-label">
           {source === "live" ? "Live Federato data" : "Cached fallback data"}

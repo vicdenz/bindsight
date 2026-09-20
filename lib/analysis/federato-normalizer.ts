@@ -45,6 +45,7 @@ const policySchema = z.object({
   }),
   submission: z.object({
     id: z.union([z.string(), z.number()]),
+    status: z.string().nullable().optional(),
     received_date: z.string(),
     submission_number: z.string(),
   }),
@@ -109,6 +110,7 @@ export function normalizeFederatoPolicy(input: unknown): NormalizedSubmission {
   return {
     id: policy.submission.submission_number,
     accountName: policy.insured.name,
+    sourceStatus: policy.submission.status ?? null,
     submissionType: normalizeBusinessType(policy.business_type),
     lineOfBusiness: policy.line_of_business ?? null,
     primaryState: policy.insured.hq?.state ?? primaryLocation?.state ?? null,

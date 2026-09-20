@@ -6,6 +6,8 @@ const TIER_ORDER: Record<ActionTier, number> = {
   request_information: 2,
   manual_review: 3,
   likely_decline: 4,
+  screened_out: 5,
+  not_evaluated: 6,
 };
 
 export function compareDecisionPackets(left: DecisionPacket, right: DecisionPacket): number {

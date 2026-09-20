@@ -90,4 +90,29 @@ describe("live Federato policy normalization", () => {
       provenance: "federato",
     });
   });
+
+  it("routes renewals and unsupported lines without applying property risk gates", () => {
+    const base = {
+      id: "SUB-ROUTE",
+      accountName: "Routing Test",
+      sourceStatus: "bound",
+      primaryState: "CA",
+      totalInsuredValue: 75_000_000,
+      premium: 85_000,
+      buildingYear: 2018,
+      supportedConstructionPercentage: 80,
+      fiveYearLossValue: 0,
+      receivedAt: "2026-04-08T00:00:00.000Z",
+    };
+    const renewal = analyzeSubmission({ ...base, submissionType: "Renewal", lineOfBusiness: "Property" });
+    expect(renewal.tier).toBe("screened_out");
+    expect(renewal.screening.status).toBe("renewal");
+    expect(renewal.atoms.filter((atom) => atom.status === "not_applicable")).toHaveLength(7);
+
+    const auto = analyzeSubmission({ ...base, submissionType: "New Business", lineOfBusiness: "Auto" });
+    expect(auto.tier).toBe("not_evaluated");
+    expect(auto.screening).toMatchObject({ status: "unsupported_line", profileId: null });
+    expect(auto.atoms.find((atom) => atom.ruleId === "R-LINE")?.status).toBe("fail");
+    expect(auto.atoms.find((atom) => atom.ruleId === "R-PREMIUM")?.status).toBe("not_applicable");
+  });
 });

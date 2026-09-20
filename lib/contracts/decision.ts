@@ -15,7 +15,11 @@ export const actionTierSchema = z.enum([
   "request_information",
   "manual_review",
   "likely_decline",
+  "screened_out",
+  "not_evaluated",
 ]);
+
+export const screeningStatusSchema = z.enum(["evaluated", "renewal", "unsupported_line"]);
 
 export const predicateSchema = z.object({
   operator: z.enum(["eq", "neq", "in", "not_in", "gt", "gte", "lt", "lte", "between", "percentage_gt"]),
@@ -70,6 +74,9 @@ export const decisionPacketSchema = z.object({
   submission: z.object({
     id: z.string().min(1),
     accountName: z.string().min(1),
+    submissionType: z.string().nullable(),
+    lineOfBusiness: z.string().nullable(),
+    sourceStatus: z.string().nullable().optional(),
     primaryState: z.string().nullable(),
     premium: z.number().nullable(),
     totalInsuredValue: z.number().nullable(),
@@ -79,6 +86,11 @@ export const decisionPacketSchema = z.object({
   evidence: z.array(evidenceItemSchema),
   calculations: z.array(calculationSchema),
   tier: actionTierSchema,
+  screening: z.object({
+    status: screeningStatusSchema,
+    profileId: z.string().nullable(),
+    reason: z.string().min(1),
+  }),
   score: z.object({
     targetAlignment: z.number().min(0).max(1),
     evidenceCompleteness: z.number().min(0).max(1),
@@ -109,6 +121,7 @@ export const decisionPacketSchema = z.object({
 
 export type RuleStatus = z.infer<typeof ruleStatusSchema>;
 export type ActionTier = z.infer<typeof actionTierSchema>;
+export type ScreeningStatus = z.infer<typeof screeningStatusSchema>;
 export type AppetiteRule = z.infer<typeof appetiteRuleSchema>;
 export type EvidenceItem = z.infer<typeof evidenceItemSchema>;
 export type Calculation = z.infer<typeof calculationSchema>;

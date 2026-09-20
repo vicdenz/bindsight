@@ -22,7 +22,7 @@ const livePolicyQuery: FederatoQueryRequest = {
     business_type: true,
     line_of_business: true,
     insured: { id: true, name: true, hq: { id: true, state: true } },
-    submission: { id: true, received_date: true, submission_number: true },
+    submission: { id: true, status: true, received_date: true, submission_number: true },
     claims: { id: true, date_of_loss: true, paid_expense: true, paid_indemnity: true, reserve_expense: true, reserve_indemnity: true },
     exposure_units: {
       kind: true,

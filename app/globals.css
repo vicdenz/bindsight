@@ -22,6 +22,12 @@ section { margin: 1.5rem 0; }
 .tier-request_information, .status-missing { border-color: #a36200; }
 .tier-manual_review, .status-conflict { border-color: #7651a8; }
 .tier-likely_decline, .status-fail { border-color: #a83232; }
+.tier-screened_out { border-color: #356a8a; background: #eef7fc; }
+.tier-not_evaluated, .status-not_applicable { border-color: #69737d; background: #f3f4f5; }
+.cohort-nav { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0.8rem 0; }
+.cohort-nav a { padding: 0.45rem 0.65rem; border: 1px solid #aab2bd; border-radius: 0.25rem; background: #fff; }
+.source-rule { scroll-margin-top: 1rem; }
+tr[id], li[id], section[id] { scroll-margin-top: 1rem; }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; background: #fff; }
 th, td { padding: 0.75rem; border: 1px solid #d7dce2; text-align: left; vertical-align: top; }

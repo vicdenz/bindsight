@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ActionTier, DecisionPacket, RuleStatus } from "@/lib/contracts";
 
 const tierLabels: Record<ActionTier, string> = {
@@ -5,7 +6,9 @@ const tierLabels: Record<ActionTier, string> = {
   standard_review: "Standard review",
   request_information: "Request information",
   manual_review: "Manual review",
-  likely_decline: "Likely decline",
+  likely_decline: "Outside appetite",
+  screened_out: "Renewal workflow",
+  not_evaluated: "No matching profile",
 };
 
 const statusLabels: Record<RuleStatus, string> = {
@@ -30,20 +33,36 @@ function displayValue(value: unknown): string {
 }
 
 export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket }>) {
+  const packetJsonUrl = `/api/submissions/${encodeURIComponent(packet.submission.id)}/decision`;
+
   return (
     <article>
       <section className="summary" aria-labelledby="recommendation-heading">
         <div>
-          <h2 id="recommendation-heading">Recommendation</h2>
+          <h2 id="recommendation-heading">Assessment</h2>
           <p className={`tier tier-${packet.tier}`}>{tierLabels[packet.tier]}</p>
           <p>{packet.explanation}</p>
+          <p>{packet.screening.reason}</p>
+          <p>
+            <Link href="/appetite">View appetite sources</Link>
+            {" · "}<a href={packetJsonUrl}>View packet JSON</a>
+          </p>
         </div>
-        <dl className="score-list">
-          <div><dt>Target alignment</dt><dd>{percentage(packet.score.targetAlignment)}</dd></div>
-          <div><dt>Evidence completeness</dt><dd>{percentage(packet.score.evidenceCompleteness)}</dd></div>
-          <div><dt>Premium opportunity</dt><dd>{percentage(packet.score.premiumOpportunity)}</dd></div>
-          <div><dt>Analysis time</dt><dd>{packet.analysis.latencyMs} ms</dd></div>
-        </dl>
+        {packet.screening.status === "evaluated" ? (
+          <dl className="score-list">
+            <div><dt>Target alignment</dt><dd>{percentage(packet.score.targetAlignment)}</dd></div>
+            <div><dt>Evidence completeness</dt><dd>{percentage(packet.score.evidenceCompleteness)}</dd></div>
+            <div><dt>Premium opportunity</dt><dd>{percentage(packet.score.premiumOpportunity)}</dd></div>
+            <div><dt>Analysis time</dt><dd>{packet.analysis.latencyMs} ms</dd></div>
+          </dl>
+        ) : (
+          <dl className="score-list">
+            <div><dt>Submission type</dt><dd>{packet.submission.submissionType ?? "Unknown"}</dd></div>
+            <div><dt>Line</dt><dd>{packet.submission.lineOfBusiness ?? "Unknown"}</dd></div>
+            <div><dt>Source status</dt><dd>{packet.submission.sourceStatus ?? "Unknown"}</dd></div>
+            <div><dt>Profile</dt><dd>{packet.screening.profileId ?? "None"}</dd></div>
+          </dl>
+        )}
       </section>
 
       {packet.nextBestQuestion && (
@@ -63,9 +82,15 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
               {packet.atoms.map((atom) => (
                 <tr key={atom.id}>
                   <td><span className={`status status-${atom.status}`}>{statusLabels[atom.status]}</span></td>
-                  <td><code>{atom.ruleId}</code></td>
+                  <td><Link href={`/appetite#${encodeURIComponent(atom.ruleId)}`}><code>{atom.ruleId}</code></Link></td>
                   <td>{atom.reason}</td>
-                  <td>{[...atom.evidenceIds, ...atom.calculationIds].join(", ") || "None"}</td>
+                  <td>
+                    {[...atom.evidenceIds, ...atom.calculationIds].length > 0
+                      ? [...atom.evidenceIds, ...atom.calculationIds].map((id, index) => (
+                          <span key={id}>{index > 0 && ", "}<a href={`#${encodeURIComponent(id)}`}><code>{id}</code></a></span>
+                        ))
+                      : "None"}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -77,14 +102,15 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
         <h2 id="evidence-heading">Evidence ledger</h2>
         <div className="table-scroll">
           <table>
-            <thead><tr><th scope="col">ID</th><th scope="col">Source</th><th scope="col">Field</th><th scope="col">Value</th></tr></thead>
+            <thead><tr><th scope="col">ID</th><th scope="col">Source</th><th scope="col">Field</th><th scope="col">Normalized</th><th scope="col">Raw source value</th></tr></thead>
             <tbody>
               {packet.evidence.map((item) => (
                 <tr key={item.id} id={item.id}>
-                  <th scope="row"><code>{item.id}</code></th>
-                  <td>{item.resource} / {item.recordId}</td>
+                  <th scope="row"><a href={`#${encodeURIComponent(item.id)}`}><code>{item.id}</code></a></th>
+                  <td><a href={packetJsonUrl}>{item.resource} / {item.recordId}</a></td>
                   <td>{item.fieldPath}</td>
                   <td>{displayValue(item.normalizedValue)}</td>
+                  <td><details><summary>View raw</summary><code>{displayValue(item.rawValue)}</code></details></td>
                 </tr>
               ))}
             </tbody>
@@ -98,7 +124,8 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
           <ul>
             {packet.calculations.map((calculation) => (
               <li key={calculation.id} id={calculation.id}>
-                <code>{calculation.id}</code>: {calculation.operation}({calculation.inputIds.join(", ")}) = {calculation.result} {calculation.unit}
+                <a href={`#${encodeURIComponent(calculation.id)}`}><code>{calculation.id}</code></a>: {calculation.operation}(
+                {calculation.inputIds.map((id, index) => <span key={id}>{index > 0 && ", "}<a href={`#${encodeURIComponent(id)}`}><code>{id}</code></a></span>)}) = {calculation.result} {calculation.unit}
               </li>
             ))}
           </ul>
@@ -114,6 +141,15 @@ export function DecisionPacketView({ packet }: Readonly<{ packet: DecisionPacket
           </ul>
         </section>
       )}
+
+      <section id="source-context" aria-labelledby="source-context-heading">
+        <h2 id="source-context-heading">Source context</h2>
+        <p>
+          Evidence marked Federato was retrieved from the expanded policy/submission graph. Derived values retain their raw inputs above.
+          {" "}<a href={packetJsonUrl}>Open this complete decision packet as JSON</a> or{" "}
+          <Link href="/appetite">inspect the versioned appetite rules and source wording</Link>.
+        </p>
+      </section>
     </article>
   );
 }

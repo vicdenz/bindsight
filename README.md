@@ -4,9 +4,9 @@ BindSight is an evidence-backed underwriting triage workbench built for the Hack
 
 ## What the user gets
 
-The home page ranks submissions by appetite fit and review priority. Opening a submission shows:
+The home page first segments the portfolio into new-property candidates, renewals, and lines without a configured profile. Only new-property candidates are ranked against the supplied commercial-property appetite. Opening a record shows:
 
-- its recommended action tier;
+- its assessment or routing treatment;
 - all eight appetite checks and their target, pass, fail, missing, or conflict status;
 - the exact evidence used by every check;
 - evidence-completeness and target-alignment scores;
@@ -30,7 +30,9 @@ The Next.js server authenticates to Federato with OAuth client credentials and q
 
 The dataset contains 158 `Submission` records, but only the 113 bound submissions have linked `Policy` records containing all fields required by the appetite guide. The remaining submission statuses do not expose premium or insured building schedules through the published relationship graph. BindSight therefore analyzes the complete, evidence-backed policy/submission cohort rather than inventing missing values for unlinked records. This is a challenge-data limitation, not a claim that those 113 records are a live operational inbox.
 
-The supplied appetite is intentionally narrow: new property business only, selected states, $50K–$175K premium, TIV up to $150M, strict building age/construction rules, and losses below $100K. The challenge portfolio includes renewals and six other lines, so a large out-of-appetite population is expected and remains visible for auditability.
+The supplied appetite is intentionally narrow: new property business only, selected states, $50K–$175K premium, TIV up to $150M, strict building age/construction rules, and losses below $100K. Renewals are routed to a separate workflow and do not run through the remaining new-business gates. New business in other lines is marked “no matching profile,” not declined. All cohorts remain visible for auditability.
+
+Rule IDs in a decision packet link to the exact versioned source wording on `/appetite`. Decision atoms link to their evidence and calculation records, raw values are expandable, and every report links to its complete JSON representation. Federato does not expose a public browser URL for individual challenge records, so BindSight links to the locally retrieved decision packet rather than fabricating an upstream deep link.
 
 Live reads use a 10-second upstream timeout, bounded pagination, relationship deduplication, per-record validation, request deduplication, and a 30-second in-process cache. If a refresh fails, BindSight serves the last successful live snapshot when possible. Without any live snapshot it serves a clearly labeled bundled demo fallback.
 

@@ -3,6 +3,7 @@ import type { DecisionPacket } from "../contracts";
 export type NormalizedSubmission = {
   id: string;
   accountName: string;
+  sourceStatus?: string | null;
   submissionType: string | null;
   lineOfBusiness: string | null;
   primaryState: string | null;
@@ -15,7 +16,7 @@ export type NormalizedSubmission = {
   fieldEvidence?: Partial<Record<NormalizedField, NormalizedFieldEvidence>>;
 };
 
-export type NormalizedField = Exclude<keyof NormalizedSubmission, "id" | "accountName" | "receivedAt" | "fieldEvidence">;
+export type NormalizedField = Exclude<keyof NormalizedSubmission, "id" | "accountName" | "sourceStatus" | "receivedAt" | "fieldEvidence">;
 
 export type NormalizedFieldEvidence = {
   resource: string;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { californiaTargetToAcceptableDiff } from "@/lib/analysis/appetite-studio";
+import { APPETITE_VERSION, getAppetiteRules } from "@/lib/appetite/rules";
 
 function tierLabel(value: string) {
   return value.replaceAll("_", " ");
@@ -8,6 +9,7 @@ function tierLabel(value: string) {
 
 export default function AppetiteStudioPage() {
   const appetiteDiff = californiaTargetToAcceptableDiff();
+  const currentRules = getAppetiteRules();
 
   return (
     <>
@@ -20,6 +22,22 @@ export default function AppetiteStudioPage() {
         </div>
         <span className="source-label">Cached simulation</span>
       </div>
+
+      <section aria-labelledby="current-profile-heading">
+        <h2 id="current-profile-heading">Current commercial-property profile</h2>
+        <p>
+          Version <code>{APPETITE_VERSION}</code>, transcribed from the supplied Hack the North 2026
+          <code> APPETITE_GUIDELINES.pdf</code>. Each decision packet links directly to the applicable rule below.
+        </p>
+        {currentRules.map((rule) => (
+          <article className="empty-state source-rule" id={rule.id} key={rule.id}>
+            <h3>{rule.concept} <a href={`#${rule.id}`}><code>{rule.id}</code></a></h3>
+            <blockquote>{rule.sourceText}</blockquote>
+            <p><strong>Scope:</strong> {rule.scope} · <strong>Version:</strong> {rule.version}</p>
+            {rule.ambiguity && <p><strong>Documented ambiguity:</strong> {rule.ambiguity}</p>}
+          </article>
+        ))}
+      </section>
 
       <section>
         <h2>Proposed change</h2>
