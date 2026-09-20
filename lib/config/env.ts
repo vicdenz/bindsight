@@ -10,6 +10,7 @@ const serverEnvironmentSchema = z.object({
   FEDERATO_AUTH_URL: optionalUrl,
   FEDERATO_HANDLER_URL: optionalUrl,
   BASETEN_API_KEY: z.string().optional(),
+  BASETEN_OPENAI_BASE_URL: optionalUrl,
   BASETEN_FAST_MODEL: z.string().optional(),
   BASETEN_REASONING_MODEL: z.string().optional(),
   BASETEN_COMPILER_MODEL: z.string().optional(),
@@ -34,7 +35,7 @@ export function getProviderConfiguration(): Record<ProviderName, { configured: b
   const environment = readServerEnvironment();
   const requirements: Record<ProviderName, Array<keyof typeof environment>> = {
     federato: ["FEDERATO_CLIENT_ID", "FEDERATO_CLIENT_SECRET", "FEDERATO_AUTH_URL", "FEDERATO_HANDLER_URL"],
-    baseten: ["BASETEN_API_KEY", "BASETEN_FAST_MODEL", "BASETEN_REASONING_MODEL", "BASETEN_COMPILER_MODEL"],
+    baseten: ["BASETEN_API_KEY", "BASETEN_OPENAI_BASE_URL", "BASETEN_FAST_MODEL", "BASETEN_REASONING_MODEL", "BASETEN_COMPILER_MODEL"],
     openai: ["OPENAI_API_KEY", "OPENAI_FAST_MODEL", "OPENAI_REVIEW_MODEL"],
     sentry: ["SENTRY_AUTH_TOKEN", "SENTRY_ORG", "SENTRY_PROJECT"],
   };

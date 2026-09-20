@@ -41,3 +41,15 @@
 **Before result:** No executable application or decision output.
 
 **After result:** All five action tiers render from auditable cached packets; unit, integration, rule, reviewer, cost, query, lint, typecheck, production-build, dependency-audit, and secret-audit checks pass.
+
+## 2026-09-19 — credential-independent feature completion
+
+**Problem:** Provider credentials were intentionally deferred, while the full product still needed to be implemented and testable.
+
+**Proposed change:** Use injected transports and fixed fixtures to complete the Baseten compilation/planning/explanation lanes, OpenAI Responses reviewer loop, full eight-rule orchestration, appetite diffs, portfolio preview, and privacy-safe Sentry configuration.
+
+**Human decision:** Directed development to continue and leave environment variables and live validation until the end.
+
+**Before result:** Only a cached five-packet vertical slice and provider safety foundations existed.
+
+**After result:** The complete credential-independent application builds with provider transports dormant behind environment checks; deterministic fallbacks preserve every UI/API workflow. Live probes, authentic Sentry evidence, and deployment remain the final external validation gate.

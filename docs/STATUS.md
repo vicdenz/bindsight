@@ -14,6 +14,13 @@
 - [x] OpenAI reviewer tool/citation/cost guards implemented; reviewer and cost evals passed.
 - [x] Cached analysis API and five-tier demo implemented; 3 integration tests passed.
 - [x] Bare-bones queue and packet UI production build passed.
+- [x] All eight appetite rules, next-best questions, appetite version diff, run state, and portfolio preview implemented.
+- [x] Baseten compiler/planner/explanation lanes implemented with repairs, grounding validation, batching, cache, and fallback.
+- [x] OpenAI Responses reviewer transport and read-only runtime implemented behind budget and citation guards.
+- [x] Sentry tracing, logs, Replay, error handling, and telemetry redaction configured but disabled without a DSN.
+- [x] Appetite Studio and Senior Reviewer exposed in the bare-bones UI.
 - [ ] Live provider probes completed.
+- [ ] Authentic Sentry trace-to-fix evidence captured after credentials are supplied.
+- [ ] Vercel deployment and live/cached browser rehearsal completed.
 
 Command results are recorded as implementation progresses.
