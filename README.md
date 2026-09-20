@@ -112,6 +112,6 @@ npm run build
 - `lib/openai/` — reviewer provider, citation validation, and budget controls.
 - `lib/contracts/` — runtime-validated data contracts.
 - `tests/` and `evals/` — correctness, safety, quality, and cost checks.
-- `docs/planning/` — detailed build, domain, evaluation, demo, and architecture references.
+- `docs/` — current assumptions, architecture decisions, provider boundaries, design system, and Devpost narrative.
 
-For deeper implementation context, start with the [build specification](docs/planning/Federato_BindSight_Build_Spec.md).
+For deeper implementation context, start with the [documentation index](docs/README.md).
