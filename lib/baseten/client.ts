@@ -11,6 +11,45 @@ export type BasetenCompletionRequest = {
 export type BasetenCompletion = { content: string; model?: string; inputTokens?: number; outputTokens?: number };
 export interface BasetenTransport { complete(request: BasetenCompletionRequest): Promise<BasetenCompletion> }
 
+export interface BasetenOpenAITransportOptions { apiKey: string; baseUrl: string; fetcher?: typeof fetch }
+
+export class BasetenOpenAITransport implements BasetenTransport {
+  private readonly fetcher: typeof fetch;
+
+  constructor(private readonly options: BasetenOpenAITransportOptions) {
+    this.fetcher = options.fetcher ?? fetch;
+  }
+
+  async complete(request: BasetenCompletionRequest): Promise<BasetenCompletion> {
+    const response = await this.fetcher(`${this.options.baseUrl.replace(/\/$/, "")}/chat/completions`, {
+      method: "POST",
+      headers: { Authorization: `Api-Key ${this.options.apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: request.model,
+        messages: request.messages,
+        temperature: request.temperature,
+        max_tokens: request.maxTokens,
+        response_format: request.responseFormat,
+      }),
+    });
+    const body: unknown = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(`Baseten completion failed with status ${response.status}`);
+    if (!body || typeof body !== "object") throw new Error("Baseten returned an invalid completion response");
+    const record = body as Record<string, unknown>;
+    const choices = Array.isArray(record.choices) ? record.choices : [];
+    const first = choices[0] as Record<string, unknown> | undefined;
+    const message = first?.message as Record<string, unknown> | undefined;
+    if (typeof message?.content !== "string") throw new Error("Baseten completion did not contain text content");
+    const usage = record.usage as Record<string, unknown> | undefined;
+    return {
+      content: message.content,
+      model: typeof record.model === "string" ? record.model : request.model,
+      inputTokens: typeof usage?.prompt_tokens === "number" ? usage.prompt_tokens : undefined,
+      outputTokens: typeof usage?.completion_tokens === "number" ? usage.completion_tokens : undefined,
+    };
+  }
+}
+
 export type BasetenClientOptions = { retries?: number; cache?: Map<string, BasetenCompletion>; retryable?: (error: unknown) => boolean };
 
 function stable(value: unknown): string {

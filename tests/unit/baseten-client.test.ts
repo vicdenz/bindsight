@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { BasetenClient, mapConcurrent } from "../../lib/baseten/client";
+import { BasetenClient, BasetenOpenAITransport, mapConcurrent } from "../../lib/baseten/client";
 
 describe("BasetenClient", () => {
   it("retries once and caches successful OpenAI-compatible completions", async () => {
@@ -30,5 +30,29 @@ describe("BasetenClient", () => {
     });
     expect(result).toEqual([6, 2, 4, 8]);
     expect(maximum).toBe(2);
+  });
+});
+
+describe("BasetenOpenAITransport", () => {
+  it("lowers requests to the configured OpenAI-compatible endpoint", async () => {
+    let capturedUrl = "";
+    let capturedInit: RequestInit | undefined;
+    const transport = new BasetenOpenAITransport({
+      apiKey: "test-key",
+      baseUrl: "https://example.test/v1/",
+      fetcher: async (input, init) => {
+        capturedUrl = String(input);
+        capturedInit = init;
+        return new Response(JSON.stringify({
+          model: "fixture-model",
+          choices: [{ message: { content: "{\"ok\":true}" } }],
+          usage: { prompt_tokens: 4, completion_tokens: 3 },
+        }), { status: 200, headers: { "content-type": "application/json" } });
+      },
+    });
+    const result = await transport.complete({ model: "fixture-model", messages: [{ role: "user", content: "compile" }] });
+    expect(capturedUrl).toBe("https://example.test/v1/chat/completions");
+    expect((capturedInit?.headers as Record<string, string>).Authorization).toBe("Api-Key test-key");
+    expect(result).toMatchObject({ content: "{\"ok\":true}", inputTokens: 4, outputTokens: 3 });
   });
 });
