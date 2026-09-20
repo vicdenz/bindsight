@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const apiKey = process.env.BASETEN_API_KEY;
   const baseUrl = process.env.BASETEN_OPENAI_BASE_URL;
   const model = process.env.BASETEN_COMPILER_MODEL;
-  if (apiKey && baseUrl && model && body.appetiteText) {
+  if (process.env.AI_PROVIDER === "baseten" && apiKey && baseUrl && model && body.appetiteText) {
     try {
       const compiled = await compileAppetite({
         client: new BasetenClient(new BasetenOpenAITransport({ apiKey, baseUrl })),

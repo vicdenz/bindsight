@@ -5,6 +5,7 @@ import { z } from "zod";
 const optionalUrl = z.string().url().optional().or(z.literal(""));
 
 const serverEnvironmentSchema = z.object({
+  AI_PROVIDER: z.enum(["openai", "baseten"]).default("openai"),
   FEDERATO_CLIENT_ID: z.string().optional(),
   FEDERATO_CLIENT_SECRET: z.string().optional(),
   FEDERATO_AUTH_URL: optionalUrl,

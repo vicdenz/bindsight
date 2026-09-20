@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
 
-import { getProviderConfiguration } from "@/lib/config/env";
+import { getProviderConfiguration, readServerEnvironment } from "@/lib/config/env";
 
 export const dynamic = "force-dynamic";
 
 export function GET() {
   const providers = getProviderConfiguration();
+  const selectedAiProvider = readServerEnvironment().AI_PROVIDER;
 
   return NextResponse.json({
-    status: Object.values(providers).every(({ configured }) => configured) ? "ready" : "degraded",
+    status: providers.federato.configured
+      && providers.openai.configured
+      && (selectedAiProvider !== "baseten" || providers.baseten.configured)
+      ? "ready"
+      : "degraded",
+    selectedAiProvider,
     providers,
     note: "Configuration only; no paid or external provider calls were made.",
   });
