@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DecisionPacketView } from "@/components/decision-packet";
+import { ReviewerPanel } from "@/components/reviewer-panel";
 import { getDemoDecisionPacket } from "@/lib/cache/demo-snapshot";
 
 export default async function SubmissionPage({
@@ -24,6 +25,7 @@ export default async function SubmissionPage({
         </span>
       </div>
       <DecisionPacketView packet={packet} />
+      <ReviewerPanel />
     </>
   );
 }

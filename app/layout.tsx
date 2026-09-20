@@ -14,7 +14,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body>
         <header className="site-header">
           <Link href="/" className="brand">BindSight</Link>
-          <span>Underwriting triage</span>
+          <nav aria-label="Primary navigation">
+            <Link href="/">Decision queue</Link>
+            {" · "}
+            <Link href="/appetite">Appetite Studio</Link>
+          </nav>
         </header>
         <main>{children}</main>
       </body>
